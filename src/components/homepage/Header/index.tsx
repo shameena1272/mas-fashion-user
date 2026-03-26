@@ -507,10 +507,10 @@ export default function HeroBanner() {
             <h1 className="slide-headline">{slide.headline}</h1>
             <p className="slide-sub">{slide.subheadline}</p>
             <div className="btn-row">
-              <button className="btn-primary">{slide.cta}</button>
+              {/* <button className="btn-primary">{slide.cta}</button>
               {slide.ctaSecondary && (
                 <button className="btn-ghost">{slide.ctaSecondary}</button>
-              )}
+              )} */}
             </div>
           </div>
         </div>

@@ -55,7 +55,7 @@ const ProductCard = ({ data }: ProductCardProps) => {
           </span>
         ) : ( */}
           <span className="font-bold text-black text-xl xl:text-2xl">
-            ${data.price}
+            ₹{data.price}
           </span>
         {/* )}
         {data.discount.percentage > 0 && (

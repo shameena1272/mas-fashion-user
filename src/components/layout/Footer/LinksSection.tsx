@@ -30,32 +30,32 @@ const footerLinksData: FooterLinks[] = [
       },
     ],
   },
-  {
-    id: 2,
-    title: "help",
-    children: [
-      {
-        id: 21,
-        label: "customer support",
-        url: "#",
-      },
-      {
-        id: 22,
-        label: "delivery details",
-        url: "#",
-      },
-      {
-        id: 23,
-        label: "terms & conditions",
-        url: "#",
-      },
-      {
-        id: 24,
-        label: "privacy policy",
-        url: "#",
-      },
-    ],
-  },
+  // {
+  //   id: 2,
+  //   title: "help",
+  //   children: [
+  //     {
+  //       id: 21,
+  //       label: "customer support",
+  //       url: "#",
+  //     },
+  //     {
+  //       id: 22,
+  //       label: "delivery details",
+  //       url: "#",
+  //     },
+  //     {
+  //       id: 23,
+  //       label: "terms & conditions",
+  //       url: "#",
+  //     },
+  //     {
+  //       id: 24,
+  //       label: "privacy policy",
+  //       url: "#",
+  //     },
+  //   ],
+  // },
   {
     id: 3,
     title: "faq",
@@ -82,32 +82,32 @@ const footerLinksData: FooterLinks[] = [
       },
     ],
   },
-  {
-    id: 4,
-    title: "resources",
-    children: [
-      {
-        id: 41,
-        label: "Free eBooks",
-        url: "#",
-      },
-      {
-        id: 42,
-        label: "development tutorial",
-        url: "#",
-      },
-      {
-        id: 43,
-        label: "How to - Blog",
-        url: "#",
-      },
-      {
-        id: 44,
-        label: "youtube playlist",
-        url: "#",
-      },
-    ],
-  },
+  // {
+  //   id: 4,
+  //   title: "resources",
+  //   children: [
+  //     {
+  //       id: 41,
+  //       label: "Free eBooks",
+  //       url: "#",
+  //     },
+  //     {
+  //       id: 42,
+  //       label: "development tutorial",
+  //       url: "#",
+  //     },
+  //     {
+  //       id: 43,
+  //       label: "How to - Blog",
+  //       url: "#",
+  //     },
+  //     {
+  //       id: 44,
+  //       label: "youtube playlist",
+  //       url: "#",
+  //     },
+  //   ],
+  // },
 ];
 
 const LinksSection = () => {

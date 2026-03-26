@@ -14,45 +14,45 @@ import InputGroup from "@/components/ui/input-group";
 import ResTopNavbar from "./ResTopNavbar";
 import CartBtn from "./CartBtn";
 
-const data: NavMenu = [
-  {
-    id: 1,
-    label: "Shop",
-    type: "MenuList",
-    children: [
-      {
-        id: 11,
-        label: "Men's clothes",
-        url: "/shop#men-clothes",
-        description: "In attractive and spectacular colors and designs",
-      },
-      {
-        id: 12,
-        label: "Women's clothes",
-        url: "/shop#women-clothes",
-        description: "Ladies, your style and tastes are important to us",
-      },
-      {
-        id: 13,
-        label: "Kids clothes",
-        url: "/shop#kids-clothes",
-        description: "For all ages, with happy and beautiful colors",
-      },
-      {
-        id: 14,
-        label: "Bags and Shoes",
-        url: "/shop#bag-shoes",
-        description: "Suitable for men, women and all tastes and styles",
-      },
-    ],
-  },
-  {
-    id: 2,
-    type: "MenuItem",
-    label: "On Sale",
-    url: "/shop#on-sale",
-    children: [],
-  },
+// const data: NavMenu = [
+//   {
+//     id: 1,
+//     label: "Shop",
+//     type: "MenuList",
+//     children: [
+//       {
+//         id: 11,
+//         label: "Men's clothes",
+//         url: "/shop#men-clothes",
+//         description: "In attractive and spectacular colors and designs",
+//       },
+//       {
+//         id: 12,
+//         label: "Women's clothes",
+//         url: "/shop#women-clothes",
+//         description: "Ladies, your style and tastes are important to us",
+//       },
+//       {
+//         id: 13,
+//         label: "Kids clothes",
+//         url: "/shop#kids-clothes",
+//         description: "For all ages, with happy and beautiful colors",
+//       },
+//       {
+//         id: 14,
+//         label: "Bags and Shoes",
+//         url: "/shop#bag-shoes",
+//         description: "Suitable for men, women and all tastes and styles",
+//       },
+//     ],
+//   },
+  // {
+  //   id: 2,
+  //   type: "MenuItem",
+  //   label: "On Sale",
+  //   url: "/shop#on-sale",
+  //   children: [],
+  // },
   // {
   //   id: 3,
   //   type: "MenuItem",
@@ -60,14 +60,14 @@ const data: NavMenu = [
   //   url: "/shop#new-arrivals",
   //   children: [],
   // },
-  {
-    id: 4,
-    type: "MenuItem",
-    label: "Brands",
-    url: "/shop#brands",
-    children: [],
-  },
-];
+  // {
+  //   id: 4,
+  //   type: "MenuItem",
+  //   label: "Brands",
+  //   url: "/shop#brands",
+  //   children: [],
+  // },
+// ];
 
 const TopNavbar = () => {
   return (
@@ -75,7 +75,7 @@ const TopNavbar = () => {
       <div className="flex relative max-w-frame mx-auto items-center justify-between md:justify-start py-5 md:py-6 px-4 xl:px-0">
         <div className="flex items-center">
           <div className="block md:hidden mr-4">
-            <ResTopNavbar data={data} />
+            {/* <ResTopNavbar data={data} /> */}
           </div>
           <Link
             href="/"
@@ -87,8 +87,8 @@ const TopNavbar = () => {
             Auravault
           </Link>
         </div>
-        <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
-          <NavigationMenuList>
+        {/* <NavigationMenu className="hidden md:flex mr-2 lg:mr-7"> */}
+          {/* <NavigationMenuList>
             {data.map((item) => (
               <React.Fragment key={item.id}>
                 {item.type === "MenuItem" && (
@@ -100,7 +100,7 @@ const TopNavbar = () => {
               </React.Fragment>
             ))}
           </NavigationMenuList>
-        </NavigationMenu>
+        </NavigationMenu> */}
         <InputGroup className="hidden md:flex bg-[#F0F0F0] mr-3 lg:mr-10">
           <InputGroup.Text>
             <Image
