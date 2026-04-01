@@ -193,7 +193,7 @@ export default function HeroBanner() {
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [paused, setPaused] = useState(false);
   const [slides, setSlides] = useState<BannerSlide[]>([]);
-  const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const api = process.env.NEXT_PUBLIC_API_URL
 
   const goTo = useCallback(
     (index: number, dir: "next" | "prev" = "next") => {
