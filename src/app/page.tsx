@@ -1,7 +1,13 @@
 import ProductListSec from "@/components/common/ProductListSec";
 import HeroBanner from "@/components/homepage/Header";
 import { Product } from "@/types/product.types";
-const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+// const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const api = process.env.NEXT_PUBLIC_API_URL;
+
+if (!api) {
+  throw new Error("API URL is not defined");
+}
+
 
 async function getProducts(): Promise<Product[]> {
   try {
