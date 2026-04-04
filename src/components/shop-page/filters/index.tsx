@@ -12,13 +12,12 @@ import type { RootState } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { resetFilters } from "@/lib/features/filters/filtersSlice";
 
-const Filters = () => {
+const Filters = ({ onApply }: { onApply?: () => void }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const filters = useSelector((state: RootState) => state.filters);
 
   const handleApplyFilter = () => {
-    // Create query parameters from filters
     const params = new URLSearchParams();
 
     if (filters.categories.length > 0) {
@@ -32,19 +31,17 @@ const Filters = () => {
       params.append("maxPrice", filters.priceRange[1].toString());
     }
 
-    // Navigate with query parameters
     const queryString = params.toString();
     const url = `/shop${queryString ? `?${queryString}` : ""}`;
-    
-    console.log("Applying filters:", filters);
-    console.log("Navigating to:", url);
-    
+
     router.push(url);
+    onApply?.();
   };
 
   const handleResetFilter = () => {
     dispatch(resetFilters());
     router.push("/shop");
+    onApply?.();
   };
 
   return (

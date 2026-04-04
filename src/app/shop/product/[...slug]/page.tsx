@@ -57,13 +57,15 @@ async function getProduct(id: string): Promise<Product | null> {
 export default async function ProductPage({
   params,
 }: {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }) {
-  if (!params.slug || params.slug.length === 0) {
+  const { slug } = await params;
+
+  if (!slug || slug.length === 0) {
     notFound();
   }
 
-  const productId = params.slug[0];
+  const productId = slug[0];
   
   try {
     const productData = await getProduct(productId);
