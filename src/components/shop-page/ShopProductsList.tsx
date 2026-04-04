@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ProductCard from "@/components/common/ProductCard";
 import { Product } from "@/types/product.types";
@@ -47,16 +47,16 @@ const ShopProductsList = () => {
   const prevParamsRef = useRef<string>("");
 
   useEffect(() => {
-    const paramsKey = searchParams.toString();
-    // Reset to page 1 when filters change
-    if (paramsKey !== prevParamsRef.current) {
-      prevParamsRef.current = paramsKey;
-      setCurrentPage(1);
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
     if (!api) return;
+
+    const paramsKey = searchParams.toString();
+    const filtersChanged = paramsKey !== prevParamsRef.current;
+    const page = filtersChanged ? 1 : currentPage;
+
+    if (filtersChanged) {
+      prevParamsRef.current = paramsKey;
+      if (currentPage !== 1) { setCurrentPage(1); return; }
+    }
 
     const controller = new AbortController();
 

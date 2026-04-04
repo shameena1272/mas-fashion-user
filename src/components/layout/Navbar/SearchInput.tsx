@@ -1,134 +1,100 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import InputGroup from "@/components/ui/input-group";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  setQuery,
-  setSuggestions,
-  setIsLoading,
-} from "@/lib/features/search/searchSlice";
-import type { RootState } from "@/lib/store";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+type Suggestion = {
+  id: string;
+  title: string;
+  category: string;
+  price: number;
+  srcUrl: string;
+};
+
 const SearchInput = () => {
-  const dispatch = useDispatch();
   const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const api = process.env.NEXT_PUBLIC_API_URL;
 
-  const { query, suggestions, isLoading } = useSelector(
-    (state: RootState) => state.search
-  );
-
-  // Fetch suggestions when query changes
   useEffect(() => {
-    if (!query.trim()) {
-      dispatch(setSuggestions([]));
+    if (!query.trim() || !api) {
+      setSuggestions([]);
       setShowSuggestions(false);
       return;
     }
 
+    const controller = new AbortController();
+
     const fetchSuggestions = async () => {
-      dispatch(setIsLoading(true));
+      setIsLoading(true);
       try {
-        const searchTerm = query.trim().toLowerCase();
-        
-        // Fetch all products and filter on frontend
         const res = await fetch(
-          `${api}/product?limit=100`
+          `${api}/product?search=${encodeURIComponent(query.trim())}&limit=5`,
+          { signal: controller.signal }
         );
+        if (!res.ok || !res.headers.get("content-type")?.includes("application/json")) {
+          setSuggestions([]);
+          return;
+        }
         const data = await res.json();
-
-        console.log("🔍 Raw API response:", data);
-
         if (data.products && Array.isArray(data.products)) {
-          // Filter products based on search query
-          const filteredProducts = data.products.filter((p: any) => {
-            const name = (p.name || "").toLowerCase();
-            const category = (p.category?.name || "").toLowerCase();
-            const description = (p.description || "").toLowerCase();
-            
-            return (
-              name.includes(searchTerm) ||
-              category.includes(searchTerm) ||
-              description.includes(searchTerm)
-            );
-          });
-
-          console.log(`🔍 Filtered "${query}" - Found ${filteredProducts.length} products from ${data.products.length} total`);
-
-          // Map top 5 filtered results
-          const mappedSuggestions = filteredProducts.slice(0, 5).map((p: any) => {
-            const defaultVariant =
-              p.variants?.find((v: any) => v.isDefault) || p.variants?.[0];
-            return {
-              id: p._id,
-              title: p.name,
-              category: p.category?.name || "General",
-              price: defaultVariant?.price || 0,
-              srcUrl: defaultVariant?.images?.[0] || "/images/pic1.png",
-            };
-          });
-
-          console.log("🔍 Mapped suggestions:", mappedSuggestions);
-          dispatch(setSuggestions(mappedSuggestions));
+          setSuggestions(
+            data.products.slice(0, 5).map((p: any) => {
+              const v = p.variants?.find((v: any) => v.isDefault) || p.variants?.[0];
+              return {
+                id: p._id,
+                title: p.name,
+                category: p.category?.name || "General",
+                price: v?.price || 0,
+                srcUrl: v?.images?.[0] || "/images/pic1.png",
+              };
+            })
+          );
           setShowSuggestions(true);
         } else {
-          console.log("⚠️ No products in response");
-          dispatch(setSuggestions([]));
+          setSuggestions([]);
         }
-      } catch (error) {
-        console.error("❌ Error fetching suggestions:", error);
-        dispatch(setSuggestions([]));
+      } catch (err: any) {
+        if (err.name !== "AbortError") setSuggestions([]);
       } finally {
-        dispatch(setIsLoading(false));
+        setIsLoading(false);
       }
     };
 
-    // Debounce search
     const timer = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(timer);
-  }, [query, dispatch]);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [query, api]);
 
-  // Handle click outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target as Node) &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
+        suggestionsRef.current?.contains(e.target as Node) === false &&
+        inputRef.current?.contains(e.target as Node) === false
       ) {
         setShowSuggestions(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setQuery(e.target.value));
-  };
-
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push(`/shop?search=${encodeURIComponent(query)}`);
+      router.push(`/shop?search=${encodeURIComponent(query.trim())}`);
       setShowSuggestions(false);
-      // Don't clear the query here - let it persist for reference
     }
   };
 
-  const handleSuggestionClick = (productId: string, productName: string) => {
-    const titleSlug = productName.split(" ").join("-");
-    console.log("🔍 Navigating to product:", { productId, titleSlug });
-    router.push(`/shop/product/${productId}/${titleSlug}`);
+  const handleSuggestionClick = (id: string, name: string) => {
+    router.push(`/shop/product/${id}/${name.split(" ").join("-")}`);
     setShowSuggestions(false);
   };
 
@@ -137,14 +103,7 @@ const SearchInput = () => {
       <form onSubmit={handleSearch}>
         <InputGroup className="flex bg-[#F0F0F0]">
           <InputGroup.Text>
-            <Image
-              priority
-              src="/icons/search.svg"
-              height={20}
-              width={20}
-              alt="search"
-              className="min-w-5 min-h-5"
-            />
+            <Image priority src="/icons/search.svg" height={20} width={20} alt="search" className="min-w-5 min-h-5" />
           </InputGroup.Text>
           <InputGroup.Input
             ref={inputRef}
@@ -153,65 +112,56 @@ const SearchInput = () => {
             placeholder="Search for products..."
             className="bg-transparent placeholder:text-black/40"
             value={query}
-            onChange={handleInputChange}
-            onFocus={() => query && setShowSuggestions(true)}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => query && suggestions.length > 0 && setShowSuggestions(true)}
           />
         </InputGroup>
       </form>
 
-      {/* Suggestions Dropdown */}
-      {showSuggestions && (query.trim() || suggestions.length > 0) && (
+      {showSuggestions && (
         <div
           ref={suggestionsRef}
           className="absolute top-full left-0 right-0 mt-1 bg-white border border-black/10 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto"
         >
           {isLoading ? (
-            <div className="p-4 text-center text-black/60 text-sm">
-              Searching...
+            <div className="p-4 space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 animate-pulse">
+                  <div className="w-12 h-12 bg-gray-200 rounded flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : suggestions.length > 0 ? (
             <div className="divide-y divide-black/5">
-              {suggestions.map((product) => (
+              {suggestions.map((p) => (
                 <button
-                  key={product.id}
-                  onClick={() =>
-                    handleSuggestionClick(product.id, product.title)
-                  }
+                  key={p.id}
+                  onClick={() => handleSuggestionClick(p.id, p.title)}
                   className="w-full flex items-center gap-3 p-3 hover:bg-[#F0F0F0] transition-colors text-left"
                 >
                   <div className="relative w-12 h-12 flex-shrink-0 rounded bg-[#F0F0F0] overflow-hidden">
-                    <Image
-                      src={product.srcUrl}
-                      alt={product.title}
-                      fill
-                      className="object-cover"
-                    />
+                    <Image src={p.srcUrl} alt={p.title} fill className="object-cover" unoptimized />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-black truncate">
-                      {product.title}
-                    </p>
-                    <p className="text-xs text-black/60">{product.category}</p>
-                    <p className="text-sm font-semibold text-black mt-1">
-                      ₹{product.price}
-                    </p>
+                    <p className="text-sm font-medium text-black truncate">{p.title}</p>
+                    <p className="text-xs text-black/60">{p.category}</p>
+                    <p className="text-sm font-semibold text-black mt-0.5">₹{p.price}</p>
                   </div>
                 </button>
               ))}
               <button
-                onClick={() => {
-                  router.push(`/shop?search=${encodeURIComponent(query)}`);
-                  setShowSuggestions(false);
-                }}
-                className="w-full p-3 text-center text-sm font-medium text-black hover:bg-[#F0F0F0] transition-colors bg-white"
+                onClick={() => { router.push(`/shop?search=${encodeURIComponent(query)}`); setShowSuggestions(false); }}
+                className="w-full p-3 text-center text-sm font-medium text-black hover:bg-[#F0F0F0] transition-colors"
               >
                 View all results for "{query}"
               </button>
             </div>
           ) : (
-            <div className="p-4 text-center text-black/60 text-sm">
-              No products found
-            </div>
+            <div className="p-4 text-center text-black/60 text-sm">No products found</div>
           )}
         </div>
       )}
